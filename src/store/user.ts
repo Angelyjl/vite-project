@@ -1,5 +1,5 @@
 import {defineStore} from "pinia";
-import {login} from "@/api/auth";
+import {login,user} from "@/api/auth";
 
 // 定义state中的数据类型
 export interface IUserState {
@@ -61,11 +61,22 @@ export const useUserStore = defineStore({
                 if (response.access_token) {
                     this.setToken(response.access_token);
                     // 登录之后，token已经拿到了，然后getUser获取调用,
-                    //return await this.getUser();
+                    return await this.getUser();
                 }
             } catch (error) {
                 // console.log(error);
             }
         },
+        async getUser(){
+            try {
+                const response: any = await user();
+                this.setUserInfo(response);
+                this.setAvatar(response.avatar_url);
+                this.setUserName(response.name);
+                return response;
+            } catch (error) {
+                // console.log(error);
+            }
+        }
     }
 });
