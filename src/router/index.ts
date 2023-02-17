@@ -1,19 +1,38 @@
-import {createRouter,createWebHistory} from "vue-router";
+import {createRouter,createWebHistory,RouteRecordRaw} from "vue-router";
 import Home from '../views/Home.vue'
 import Login from '../views/login/index.vue'
 import dashboard from "@/router/modules/dashboard";
 
+const modules: any = import.meta.glob("./modules/**/*.ts",{eager: true});
+const routeModuleList: RouteRecordRaw[] = [];
+Object.keys(modules).forEach((key) => {
+    const mod = modules[key].default || {};
+    const modList = Array.isArray(mod) ? mod : [mod];
+    routeModuleList.push(...modList);
+});
+console.log(routeModuleList);
 
 
 // 2. 定义一些路由
 // 每个路由都需要映射到一个组件。
 // 我们后面再讨论嵌套路由。
 const routes = [
-    {path: '/', component: Home},
-    {path: '/login',name: 'login', component: Login},
+    {
+        path: '/',
+        // component: Home
+        redirect: '/login',
+    },
+    {
+        path: '/login',
+        name: 'login',
+        component: Login,
+        meta: {
+            title: "登录",
+        }
+    },
 ]
 const baseRoutes = [
-    ...routes, ...dashboard
+    ...routes, ...routeModuleList
 ];
 
 // 3. 创建路由实例并传递 `routes` 配置
@@ -35,6 +54,6 @@ router.beforeEach((to, from, next) => {
 next();
 });
 
-
+export {routeModuleList};
 export default router;
 
